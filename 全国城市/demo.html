@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>全国区域选择</title>
+
+
+<script type="text/javascript" src="jquery-1.4.4.js"></script>
+<script type="text/javascript">
+$("document").ready(function(){
+	reloadPro();               
+	function reloadPro(){
+		$.ajax({
+			url:"China.xml",
+			type:"post",
+			dataType:'xml',
+			success:function getProvince(msg){
+			  $(msg).find("province").each(function(){
+				  $option="<option value='"+$(this).attr("provinceID")+"'>"+$(this).attr('province')+"</option>";
+				  $("select[name='province']").append($option);
+			  });
+			  $("select[name='city'],select[name='area']").append("<option>--请选择--</option>");
+			}
+		});
+		$("select[name='province']").change(function(){
+		var $proId=$(this).attr("value");
+			$.ajax({
+				url:"China.xml",
+				type:"post",
+				dataType:"xml",
+				success:function(msg){
+				 $("select[name='city']").empty();
+				 $province=$(msg).find("province[provinceID="+$proId+"]");
+				 $province.find("City").each(function(){
+				 var $option="<option value='"+$(this).attr("CityID")+"'>"+$(this).attr('City')+"</option>";
+				 $("select[name='city']").append($option);
+				 });
+				}
+			});
+		});
+		   $("select[name='city']").change(function(){
+			var $cityId=$(this).attr("value");
+			$.ajax({
+				url:"China.xml",
+				type:"post",
+				dataType:"xml",
+				success:function(msg){
+				 $("select[name='area']").empty();
+				 $city=$(msg).find("City[CityID="+$cityId+"]");
+				 $city.find("Piecearea").each(function(){
+				 var $option="<option value='"+$(this).attr("CityID")+"'>"+$(this).attr('Piecearea')+"</option>";
+				 $("select[name='area']").append($option);
+				 });
+				}
+			});
+		});
+	}
+});
+</script>
+
+<style type="text/css">
+select{width:120px;font-size:14px;line-height:25px;}
+</style>
+
+</head>
+<body>
+
+	<select name="province"></select>
+	<select name="city"></select>
+	<select name="area"></select>
+	
+</body>
+</html>
